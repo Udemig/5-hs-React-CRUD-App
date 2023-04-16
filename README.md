@@ -29,4 +29,16 @@
     yapıldı butonun aktif olarak değişmesini sağla
     yapılan todonun üstünü çiz
 </li>
+<li> 
+5- Edit işlemini Yap:
+düzenle butonuna basıldığında ekrana bir modal çıksın
+kullanıcı bu modal üzeinden todo başlığını değiştirebilmesi için bir input olacak
+inputun içerisinde seçilen todonun başlığı yazsın
+modal üzerinde iptal ve kaydet butonları olsun
+</li>
+
+<li>
+6- Bileşenlere Ayırma:
+Yeniden kullanılabilir yapıları birer compoenent olarak ayır
+</li>
 </ul>

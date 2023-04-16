@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Todo from './components/todo';
+import Modal from './components/modal';
 
 function App() {
   const [todos, setTodos] = useState([]);
   const [todoText, setTodoText] = useState('');
-
+  const [showModal, setShowModal] = useState(false);
+  const [editingTodo, setEditingTodo] = useState({});
   // ekle butonuna tıklanınca yeni todo oluşturur
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -45,6 +48,18 @@ function App() {
   const handleDelete = (deletedTodo) => {
     const filtred = todos.filter((item) => item.id !== deletedTodo.id);
     setTodos(filtred);
+
+    // bildirim verme
+    toast.error('Todo kaldırıldı', {
+      position: 'top-right',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
   };
 
   // yapıldı butonuna tıklanıldığında çaılşır
@@ -65,6 +80,51 @@ function App() {
     newTodos.splice(index, 1, changedTodo);
 
     setTodos(newTodos);
+  };
+
+  // modaldaki save butonuna tıklandığında değerleri değişen objeyi dizeye aktarma
+  const handleSaveEdit = () => {
+    // eğer girilen title değeri boş ise ekrana uyarı verme
+    if (!editingTodo.title) {
+      toast.warn('Başlık değeri boş bırakılamaz', {
+        position: 'top-right',
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+        theme: 'light',
+      });
+      return;
+    }
+
+    // splice için değişecek elemanın dizideki yerini bulduk(indexi)
+    let index = todos.findIndex((item) => item.id === editingTodo.id);
+
+    // direkt olarak statei değiştirmek yerine todo dizisinin bir kopyasını oluşturduk
+    const cloneTodos = [...todos];
+
+    // dizinin güncellenecek todoyu çıkarıp yerine düzenlenmiş todoyu ekledik
+    cloneTodos.splice(index, 1, editingTodo);
+
+    // ekrana bastığımız diziyi güncelledik
+    setTodos(cloneTodos);
+
+    // kaydedildikten sora modalı kapatma
+    setShowModal(false);
+
+    // ekrana bildirim gönderme
+    toast.success('Todo başarıyla güncellendi', {
+      position: 'top-right',
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: 'light',
+    });
   };
 
   return (
@@ -94,38 +154,26 @@ function App() {
 
           {/* eğer state içerisinde eleman varsa elemanalrı ekrana basıyoruz */}
           {todos.map((todo) => (
-            <div className="border shadow p-3 d-flex justify-content-between align-items-center rounded">
-              <div className="d-flex flex-column gap-2  ">
-                <h5
-                  style={{
-                    textDecoration: todo.isDone ? 'line-through' : 'none',
-                  }}
-                >
-                  {todo.title}
-                </h5>
-                <p>{todo.date}</p>
-              </div>
-              <div className="btn-group">
-                <button
-                  className="btn btn-danger"
-                  onClick={() => {
-                    handleDelete(todo);
-                  }}
-                >
-                  Sil
-                </button>
-                <button className="btn btn-primary">Düzenle</button>
-                <button
-                  className="btn btn-success"
-                  onClick={() => handleDone(todo)}
-                >
-                  {todo.isDone ? 'Yapıldı' : ' Yapılacak'}
-                </button>
-              </div>
-            </div>
+            <Todo
+              key={todo.id}
+              handleDelete={handleDelete}
+              todo={todo}
+              handleDone={handleDone}
+              setShowModal={setShowModal}
+              setEditingTodo={setEditingTodo}
+            />
           ))}
         </div>
       </div>
+
+      {showModal && (
+        <Modal
+          editingTodo={editingTodo}
+          setEditingTodo={setEditingTodo}
+          setShowModal={setShowModal}
+          handleSaveEdit={handleSaveEdit}
+        />
+      )}
     </div>
   );
 }
